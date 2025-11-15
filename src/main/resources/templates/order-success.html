@@ -1,0 +1,10 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><head>
+    <meta charset="UTF-8"><title>Đặt hàng thành công</title>
+    <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css">
+</head><body class="container py-5">
+<div class="text-center">
+    <h2>Đặt hàng thành công 🎉</h2>
+    <p>Mã đơn của bạn: <strong th:text="${code}">ORD000000</strong></p>
+    <a th:href="@{/products}" class="btn btn-primary mt-3">Tiếp tục mua sắm</a>
+</div>
+</body></html>

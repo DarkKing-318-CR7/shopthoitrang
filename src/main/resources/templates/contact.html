@@ -16,7 +16,7 @@
     <link
       rel="stylesheet"
       type="text/css"
-      href="/fonts/font-awesome-4.7.0/css/font-awesome.min.css"
+      href="/fonts/font-awesome-470/css/font-awesome.min.css"
     />
     <!--===============================================================================================-->
     <link
@@ -98,32 +98,32 @@
             <div class="menu-desktop">
               <ul class="main-menu">
                 <li class="active-menu">
-                  <a href="index.html">Trang chủ</a>
+                  <a th:href="@{/}">Trang chủ</a>
                   <ul class="sub-menu">
-                    <li><a href="index.html">Trang chủ 1</a></li>
+                    <li><a th:href="@{/}">Trang chủ 1</a></li>
                     <li><a href="/home-02.html">Trang chủ 2</a></li>
                     <li><a href="/home-03.html">Trang chủ 3</a></li>
                   </ul>
                 </li>
 
                 <li>
-                  <a href="product.html">Cửa hàng</a>
+                  <a th:href="@{/products}">Cửa hàng</a>
                 </li>
 
                 <li class="label1">
-                  <a href="shoping-cart.html">Thanh toán</a>
+                  <a th:href="@{/cart}">Thanh toán</a>
                 </li>
 
                 <li>
-                  <a href="blog.html">Bài viết</a>
+                  <a th:href="@{/blog}">Bài viết</a>
                 </li>
 
                 <li>
-                  <a href="about.html">Về tôi</a>
+                  <a th:href="@{/about}">Về tôi</a>
                 </li>
 
                 <li>
-                  <a href="contact.html">Liên hệ</a>
+                  <a th:href="@{/contact}">Liên hệ</a>
                 </li>
               </ul>
             </div>
@@ -159,7 +159,7 @@
       <div class="wrap-header-mobile">
         <!-- Logo moblie -->
         <div class="logo-mobile">
-          <a href="index.html"
+          <a th:href="@{/}"
             ><img src="/images/icons/logo-01.png" alt="IMG-LOGO"
           /></a>
         </div>
@@ -222,9 +222,9 @@
 
         <ul class="main-menu-m">
           <li>
-            <a href="index.html">Trang chủ</a>
+            <a th:href="@{/}">Trang chủ</a>
             <ul class="sub-menu-m">
-              <li><a href="index.html">Trang chủ 1</a></li>
+              <li><a th:href="@{/}">Trang chủ 1</a></li>
               <li><a href="/home-02.html">Trang chủ 2</a></li>
               <li><a href="/home-03.html">Trang chủ 3</a></li>
             </ul>
@@ -234,25 +234,25 @@
           </li>
 
           <li>
-            <a href="product.html">Của hàng</a>
+            <a th:href="@{/products}">Của hàng</a>
           </li>
 
           <li>
-            <a href="shoping-cart.html" class="label1 rs1" data-label1="hot"
+            <a th:href="@{/cart}" class="label1 rs1" data-label1="hot"
               >Đặc trưng</a
             >
           </li>
 
           <li>
-            <a href="blog.html">Bài viết</a>
+            <a th:href="@{/blog}">Bài viết</a>
           </li>
 
           <li>
-            <a href="about.html">Về chúng tôi</a>
+            <a th:href="@{/about}">Về chúng tôi</a>
           </li>
 
           <li>
-            <a href="contact.html">Liên hệ</a>
+            <a th:href="@{/contact}">Liên hệ</a>
           </li>
         </ul>
       </div>

@@ -2,13 +2,16 @@ package com.uth.shoptmdt.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.uth.shoptmdt.entity.Order;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Getter @Setter
 @Table(name = "users")
 public class User {
 
@@ -33,10 +36,10 @@ public class User {
 
     private boolean enabled = true;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     private Role role;
 
-    @OneToMany(mappedBy = "user")
-    private List<Order> orders;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Order> orders = new ArrayList<>();
 }

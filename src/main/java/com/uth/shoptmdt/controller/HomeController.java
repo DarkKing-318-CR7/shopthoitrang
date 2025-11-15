@@ -17,4 +17,19 @@ public class HomeController {
         model.addAttribute("products", productService.findAll());
         return "index"; // trả về templates/index.html
     }
+
+    @GetMapping("/blog")
+    public String blog(){
+        return "blog";
+    }
+
+    @GetMapping("/about")
+    public String about(){
+        return "about";
+    }
+
+    @GetMapping("/contact")
+    public String contact(){
+        return "contact";
+    }
 }

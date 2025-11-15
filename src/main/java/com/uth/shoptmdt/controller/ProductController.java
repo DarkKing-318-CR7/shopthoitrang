@@ -1,8 +1,13 @@
 package com.uth.shoptmdt.controller;
 
+import com.uth.shoptmdt.entity.Product;
 import com.uth.shoptmdt.service.CategoryService;
 import com.uth.shoptmdt.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,21 +23,34 @@ public class ProductController {
 
     // Danh sách tất cả sản phẩm
     @GetMapping("/products")
-    public String listProducts(Model model,
-                               @RequestParam(value = "keyword", required = false) String keyword) {
+    public String listProducts(
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "8") int size,
+            @RequestParam(defaultValue = "id,desc") String sort,
+            Model model) {
 
-        if (keyword != null && !keyword.isBlank()) {
-            // nếu sau này bạn muốn tìm kiếm, có thể dùng findByNameContaining
-            model.addAttribute("products", productService.findAll()); // tạm thời cho all
-            model.addAttribute("keyword", keyword);
-        } else {
-            model.addAttribute("products", productService.findAll());
-        }
+        String[] parts = sort.split(",");
+        Sort.Direction direction = parts.length > 1 && parts[1].equalsIgnoreCase("asc")
+                ? Sort.Direction.ASC
+                : Sort.Direction.DESC;
 
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, parts[0]));
+
+        Page<Product> products = productService.search(categoryId, keyword, pageable);
+
+        model.addAttribute("products", products);
         model.addAttribute("categories", categoryService.findAll());
+        model.addAttribute("categoryId", categoryId);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("page", page);
+        model.addAttribute("size", size);
+        model.addAttribute("sort", sort);
 
-        return "product"; // templates/product.html
+        return "product";
     }
+
 
     // Lọc theo danh mục
     @GetMapping("/products/category/{id}")
@@ -53,4 +71,6 @@ public class ProductController {
         model.addAttribute("product", product);
         return "product-detail"; // templates/product-detail.html
     }
+
+
 }

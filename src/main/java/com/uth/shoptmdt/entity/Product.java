@@ -3,6 +3,8 @@ package com.uth.shoptmdt.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,7 +19,7 @@ public class Product {
     @Column(nullable = false, length = 150)
     private String name;
 
-    private Double price;
+    private BigDecimal price;
 
     @Column(length = 2000)
     private String description;

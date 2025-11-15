@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Đơn hàng</title>
+    <meta charset="UTF-8">
+</head>
+<body class="container p-4">
+<h3>Đặt hàng thành công 🎉</h3>
+<p>Mã đơn: <strong th:text="${order.id}">1</strong></p>
+<p>Người nhận: <span th:text="${order.receiverName}">Tên</span></p>
+<p>Điện thoại: <span th:text="${order.receiverPhone}">SĐT</span></p>
+<p>Địa chỉ: <span th:text="${order.receiverAddress}">ĐC</span></p>
+<p>Thanh toán: <span th:text="${order.paymentMethod}">COD</span></p>
+<p>Tổng: <strong th:text="${#numbers.formatDecimal(order.total,0,'COMMA',0,'POINT')} + ' VNĐ'">0</strong></p>
+
+<h5 class="mt-4">Sản phẩm</h5>
+<table class="table">
+    <thead><tr><th>Tên</th><th>SL</th><th>Giá</th><th>Thành tiền</th></tr></thead>
+    <tbody>
+    <tr th:each="it : ${order.items}">
+        <td th:text="${it.productName}">SP</td>
+        <td th:text="${it.quantity}">1</td>
+        <td th:text="${#numbers.formatDecimal(it.price,0,'COMMA',0,'POINT')} + ' VNĐ'">0</td>
+        <td th:text="${#numbers.formatDecimal(it.lineTotal,0,'COMMA',0,'POINT')} + ' VNĐ'">0</td>
+    </tr>
+    </tbody>
+</table>
+
+<a class="btn btn-primary" th:href="@{/products}">Tiếp tục mua sắm</a>
+</body>
+</html>

@@ -1,29 +1,28 @@
 package com.uth.shoptmdt.entity;
 
-
+import com.uth.shoptmdt.entity.Product;
+import com.uth.shoptmdt.entity.Order;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Entity
-@Table(name = "order_items")
-public class OrderItem {
+import java.math.BigDecimal;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+@Entity @Table(name = "order_items")
+@Getter @Setter @NoArgsConstructor
+public class OrderItem {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "order_id")
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Order order;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Product product;
 
-    private Integer quantity;
+    @Column(nullable = false) private Integer qty;
+    @Column(nullable = false, precision = 18, scale = 2) private BigDecimal unitPrice;
+    @Column(nullable = false, precision = 18, scale = 2) private BigDecimal lineAmount;
 
-    private Double price; // giá tại thời điểm mua
+    private BigDecimal price;   // snapshot giá tại thời điểm đặt
+    private int quantity;
 }
