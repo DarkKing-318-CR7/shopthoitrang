@@ -1,3 +1,4 @@
+// src/main/java/com/uth/shoptmdt/service/CheckoutService.java
 package com.uth.shoptmdt.service;
 
 import com.uth.shoptmdt.entity.*;
@@ -15,41 +16,36 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class CheckoutService {
 
-    private final CartService cartService;          // dùng giỏ trong session hiện tại
+    private final CartService cartService;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
 
-    /**
-     * Tạo đơn hàng từ giỏ hiện tại của Session và thông tin form
-     * @param username người mua (đang đăng nhập)
-     * @param form     thông tin nhận hàng/thanh toán
-     * @return orderId của đơn đã tạo
-     */
     @Transactional
     public Long placeOrder(String username, CheckoutForm form) {
-        if (cartService.isEmpty()) {
-            throw new IllegalStateException("Giỏ hàng rỗng");
-        }
+        if (cartService.isEmpty()) throw new IllegalStateException("Giỏ hàng rỗng");
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy user: " + username));
 
-        // Khởi tạo Order
         Order order = new Order();
         order.setUser(user);
-        order.setReceiverName(form.getReceiverName());
-        order.setReceiverPhone(form.getReceiverPhone());
-        order.setReceiverAddress(form.getReceiverAddress());
+
+        // map từ form từ Shopping Cart (fullName/phone/addressLine/…)
+        order.setFullName(form.getFullName());
+        order.setPhone(form.getPhone());
+        order.setAddressLine(form.getAddressLine());
+        order.setProvince(form.getProvince());
+        order.setDistrict(form.getDistrict());
+        order.setWard(form.getWard());
         order.setNote(form.getNote());
-        order.setPaymentMethod(form.getPaymentMethod());
-        order.setStatus(OrderStatus.PENDING);          // hoặc DEFAULT trạng thái bạn định nghĩa
+
+        order.setPaymentMethod(form.getPaymentMethod()); // "COD"
+        order.setStatus(OrderStatus.PENDING);
         order.setCreatedAt(LocalDateTime.now());
 
-        // Tổng tiền
         BigDecimal total = BigDecimal.ZERO;
 
-        // Thêm OrderItem từ giỏ
         for (CartItem ci : cartService.getItems()) {
             Product p = productRepository.findById(ci.getProduct().getId())
                     .orElseThrow(() -> new IllegalArgumentException("SP không tồn tại: " + ci.getProduct().getId()));
@@ -57,24 +53,26 @@ public class CheckoutService {
             OrderItem oi = new OrderItem();
             oi.setOrder(order);
             oi.setProduct(p);
-            oi.setPrice(p.getPrice());        // snapshot giá hiện tại
+
+            // QUAN TRỌNG: dùng đúng field đã map tên cột
+            oi.setUnitPrice(p.getPrice());
+            oi.setQty(ci.getQty());           // nếu giữ cả qty & quantity
             oi.setQuantity(ci.getQty());
 
-            // cộng dồn
-            total = total.add(oi.getPrice().multiply(BigDecimal.valueOf(oi.getQuantity())));
+            // có @PrePersist sẽ tự tính, nhưng mình gán rõ ràng luôn:
+            oi.setLineAmount(p.getPrice().multiply(BigDecimal.valueOf(ci.getQty())));
 
-            // gắn vào order
             order.getItems().add(oi);
+
+            total = total.add(oi.getLineAmount());
         }
 
-        order.setTotal(total);
 
-        // Lưu đơn + items (cascade ở entity Order -> items)
-        Order saved = orderRepository.save(order);
+        order.setTotalAmount(total);
+        order.setTotal(total); // nếu bảng còn cột 'total'
 
-        // Xóa giỏ sau khi đặt
+        Order saved = orderRepository.save(order); // @PrePersist sẽ tự tạo 'code' nếu còn trống
         cartService.clear();
-
         return saved.getId();
     }
 }

@@ -6,8 +6,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity @Table(name = "orders")
 @Getter @Setter @NoArgsConstructor
@@ -17,7 +19,8 @@ public class Order {
     private Long id;
 
     // Mã đơn (để hiển thị đẹp)
-    @Column(unique = true, nullable = false, length = 20)
+// ví dụ Order.java
+    @Column(name = "code", nullable = false, unique = true, length = 32)
     private String code;
 
     // Thông tin nhận hàng
@@ -76,5 +79,19 @@ public class Order {
     private String paymentMethod;      // ví dụ: "COD"
 
 
-    private BigDecimal total;          // tổng tiền
+    private BigDecimal total;
+
+    // tổng tiền
+
+    @PrePersist
+    void prePersist() {
+        if (code == null || code.isBlank()) {
+            code = "ORD-" +
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmss")) +
+                    "-" + UUID.randomUUID().toString().substring(0,4);
+        }
+        if (createdAt == null) createdAt = LocalDateTime.now();
+        if (totalAmount == null) totalAmount = BigDecimal.ZERO;
+        if (total == null) total = totalAmount; // nếu còn cột total
+    }
 }

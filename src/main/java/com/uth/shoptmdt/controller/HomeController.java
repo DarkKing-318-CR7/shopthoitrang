@@ -32,4 +32,8 @@ public class HomeController {
     public String contact(){
         return "contact";
     }
+    @GetMapping("/blog-detail")
+    public String blog_detail(){
+        return "blog-detail";
+    }
 }

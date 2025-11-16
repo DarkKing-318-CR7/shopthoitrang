@@ -7,22 +7,46 @@ import lombok.*;
 
 import java.math.BigDecimal;
 
-@Entity @Table(name = "order_items")
-@Getter @Setter @NoArgsConstructor
+// com.uth.shoptmdt.entity.OrderItem
+@Entity
+@Table(name = "order_items")
+@Getter @Setter
 public class OrderItem {
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne
+    @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Column(nullable = false) private Integer qty;
-    @Column(nullable = false, precision = 18, scale = 2) private BigDecimal unitPrice;
-    @Column(nullable = false, precision = 18, scale = 2) private BigDecimal lineAmount;
+    // DB dùng unit_price -> map đúng tên cột
+    @Column(name = "unit_price", nullable = false)
+    private BigDecimal unitPrice;
 
-    private BigDecimal price;   // snapshot giá tại thời điểm đặt
-    private int quantity;
+    // Một số schema có cả qty và quantity (trùng ý nghĩa).
+    // Nếu bảng của bạn CÓ CẢ HAI và đều NOT NULL thì map và set cả hai.
+    @Column(name = "qty", nullable = false)
+    private Integer qty;
+
+    @Column(name = "quantity", nullable = false)
+    private Integer quantity;
+
+    // DB bắt buộc NOT NULL
+    @Column(name = "line_amount", nullable = false)
+    private BigDecimal lineAmount;
+
+    @PrePersist
+    @PreUpdate
+    void calc() {
+        if (quantity == null) quantity = qty;        // đồng bộ
+        if (qty == null) qty = quantity;
+        if (unitPrice == null) unitPrice = BigDecimal.ZERO;
+        if (qty == null) qty = 0;
+        lineAmount = unitPrice.multiply(BigDecimal.valueOf(qty));
+    }
 }

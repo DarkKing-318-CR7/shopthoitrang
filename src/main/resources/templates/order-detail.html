@@ -1,31 +1,131 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Đơn hàng</title>
     <meta charset="UTF-8">
+    <title>Chi tiết đơn hàng</title>
+    <link rel="icon" type="image/png" href="/images/icons/favicon.png"/>
+    <link rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        .badge-status { font-size: .9rem; }
+        .order-head { background: #f8fafc; border-radius: 12px; }
+        .thumb { width: 56px; height: 56px; object-fit: cover; border-radius: 8px; }
+    </style>
 </head>
-<body class="container p-4">
-<h3>Đặt hàng thành công 🎉</h3>
-<p>Mã đơn: <strong th:text="${order.id}">1</strong></p>
-<p>Người nhận: <span th:text="${order.receiverName}">Tên</span></p>
-<p>Điện thoại: <span th:text="${order.receiverPhone}">SĐT</span></p>
-<p>Địa chỉ: <span th:text="${order.receiverAddress}">ĐC</span></p>
-<p>Thanh toán: <span th:text="${order.paymentMethod}">COD</span></p>
-<p>Tổng: <strong th:text="${#numbers.formatDecimal(order.total,0,'COMMA',0,'POINT')} + ' VNĐ'">0</strong></p>
+<body class="animsition">
 
-<h5 class="mt-4">Sản phẩm</h5>
-<table class="table">
-    <thead><tr><th>Tên</th><th>SL</th><th>Giá</th><th>Thành tiền</th></tr></thead>
-    <tbody>
-    <tr th:each="it : ${order.items}">
-        <td th:text="${it.productName}">SP</td>
-        <td th:text="${it.quantity}">1</td>
-        <td th:text="${#numbers.formatDecimal(it.price,0,'COMMA',0,'POINT')} + ' VNĐ'">0</td>
-        <td th:text="${#numbers.formatDecimal(it.lineTotal,0,'COMMA',0,'POINT')} + ' VNĐ'">0</td>
-    </tr>
-    </tbody>
-</table>
+<div class="container py-5" th:if="${order != null}">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Đơn hàng
+                <span class="text-primary" th:text="${order.code != null ? order.code : '#' + order.id}">#12345</span>
+            </h2>
+            <div class="text-muted">
+                Tạo lúc
+                <span th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy HH:mm')}">16/11/2025 12:34</span>
+            </div>
+        </div>
+        <div th:with="
+        st=${order != null ? order.status : null},
+        cls=${st == T(com.uth.shoptmdt.entity.OrderStatus).PENDING   ? 'text-bg-warning'  :
+             (st == T(com.uth.shoptmdt.entity.OrderStatus).CONFIRMED ? 'text-bg-info'     :
+             (st == T(com.uth.shoptmdt.entity.OrderStatus).SHIPPING  ? 'text-bg-primary'  :
+             (st == T(com.uth.shoptmdt.entity.OrderStatus).COMPLETED ? 'text-bg-success'  : 'text-bg-secondary')))}">
 
-<a class="btn btn-primary" th:href="@{/products}">Tiếp tục mua sắm</a>
+  <span class="badge badge-status px-3 py-2"
+        th:classappend="' ' + ${cls}"
+        th:text="${st}">PENDING</span>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Địa chỉ nhận hàng -->
+        <div class="col-lg-4">
+            <div class="p-4 order-head h-100">
+                <h5 class="mb-3">Thông tin nhận hàng</h5>
+                <div class="mb-2"><strong>Họ tên: </strong><span th:text="${order.fullName}">Nguyễn Văn A</span></div>
+                <div class="mb-2"><strong>Điện thoại: </strong><span th:text="${order.phone}">0900 000 000</span></div>
+                <div class="mb-2">
+                    <strong>Địa chỉ: </strong>
+                    <span th:text="${order.addressLine}">12 Nguyễn Huệ</span>,
+                    <span th:text="${order.ward}">Phường X</span>,
+                    <span th:text="${order.district}">Quận Y</span>,
+                    <span th:text="${order.province}">TP.HCM</span>
+                </div>
+                <div class="mb-2"><strong>Thanh toán: </strong><span th:text="${order.paymentMethod}">COD</span></div>
+                <div th:if="${order.note}"><strong>Ghi chú: </strong><span th:text="${order.note}">Giao giờ hành chính</span></div>
+            </div>
+        </div>
+
+        <!-- Danh sách sản phẩm -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Sản phẩm</h5>
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Sản phẩm</th>
+                                <th class="text-center" style="width:120px;">SL</th>
+                                <th class="text-end" style="width:160px;">Đơn giá</th>
+                                <th class="text-end" style="width:180px;">Thành tiền</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="it : ${order.items}">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img class="thumb me-3" th:src="@{'/images/' + ${it.product.image}}" alt="">
+                                        <div>
+                                            <a th:href="@{'/product/' + ${it.product.id}}"
+                                               th:text="${it.product.name}">Tên sản phẩm</a>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center" th:text="${it.quantity != null ? it.quantity : it.qty}">1</td>
+                                <td class="text-end"
+                                    th:text="${#numbers.formatDecimal((it.unitPrice != null ? it.unitPrice : it.price),0,'COMMA',0,'POINT')} + ' VNĐ'">
+                                    0
+                                </td>
+                                <td class="text-end"
+                                    th:text="${#numbers.formatDecimal(
+                               (it.lineAmount != null
+                                   ? it.lineAmount
+                                   : ((it.unitPrice != null ? it.unitPrice : it.price) * (it.quantity != null ? it.quantity : it.qty))
+                             ),0,'COMMA',0,'POINT')} + ' VNĐ'">
+                                    0
+                                </td>
+                            </tr>
+                            </tbody>
+                            <tfoot class="table-light">
+                            <tr>
+                                <th colspan="3" class="text-end">Tổng cộng</th>
+                                <th class="text-end"
+                                    th:text="${#numbers.formatDecimal((order.totalAmount != null ? order.totalAmount : order.total),0,'COMMA',0,'POINT')} + ' VNĐ'">
+                                    0
+                                </th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-3">
+                        <a th:href="@{/}" class="btn btn-outline-secondary">Tiếp tục mua sắm</a>
+                        <a th:href="@{'/order-success?id=' + ${order.id}}" class="btn btn-primary">Trang xác nhận</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- fallback khi không có order -->
+<div class="container py-5" th:if="${order == null}">
+    <div class="alert alert-warning">Không tìm thấy đơn hàng.</div>
+    <a th:href="@{/}" class="btn btn-primary">Về trang chủ</a>
+</div>
+
+<script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
 </body>
 </html>
