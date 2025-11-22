@@ -1,0 +1,152 @@
+/* ===== BACKGROUND GRADIENT + GLASS ===== */
+.auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: linear-gradient(135deg, #0b2693, #ede6e6);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hiệu ứng bóng tròn lung linh */
+.auth-wrapper::before,
+.auth-wrapper::after {
+    content: "";
+    position: absolute;
+    width: 380px;
+    height: 380px;
+    background: rgba(255, 255, 255, 0.15);
+    filter: blur(140px);
+    border-radius: 50%;
+}
+
+.auth-wrapper::before {
+    top: -80px;
+    left: -80px;
+}
+
+.auth-wrapper::after {
+    bottom: -80px;
+    right: -80px;
+}
+
+/* ===== AUTH CARD (GLASSMORPHISM) ===== */
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+
+    background: rgba(255, 255, 255, 0.11);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+
+    border-radius: 22px;
+    padding: 40px 32px;
+    box-shadow:
+            0 10px 32px rgba(0, 0, 0, 0.25),
+            inset 1px 1px 1px rgba(255,255,255,0.2);
+
+    animation: fadeIn 0.6s ease;
+}
+
+/* Title */
+.auth-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+/* ===== FLOATING LABEL INPUT ===== */
+.floating-group {
+    position: relative;
+    margin-bottom: 22px;
+}
+
+.floating-group input {
+    width: 100%;
+    height: 52px;
+    padding: 14px;
+    font-size: 15px;
+
+    border-radius: 12px;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: #fff;
+
+    outline: none;
+    transition: 0.3s;
+}
+
+.floating-group input:focus {
+    border-color: #fff;
+    box-shadow: 0 0 8px rgba(255,255,255,0.3);
+}
+
+.floating-group label {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.75);
+    font-size: 15px;
+    pointer-events: none;
+    transition: 0.3s;
+}
+
+/* Floating lên khi nhập hoặc focus */
+.floating-group input:focus + label,
+.floating-group input:not(:placeholder-shown) + label {
+    top: 4px;
+    font-size: 12px;
+    color: #fff;
+}
+
+/* Button đẹp */
+.btn-auth {
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    border: none;
+    border-radius: 14px;
+    color: #333;
+    font-weight: 700;
+    font-size: 16px;
+    transition: 0.3s;
+    box-shadow: 0 6px 16px rgba(255,255,255,0.3);
+}
+
+.btn-auth:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 22px rgba(255,255,255,0.45);
+}
+
+.auth-link {
+    font-size: 15px;
+    text-align: center;
+    margin-top: 15px;
+}
+
+.auth-link a {
+    color: #ffdfff;
+    font-weight: 600;
+}
+
+.auth-link a:hover {
+    text-decoration: underline;
+}
+
+/* Alerts */
+.alert {
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to   { opacity: 1; transform: translateY(0); }
+}

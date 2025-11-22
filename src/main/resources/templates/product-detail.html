@@ -325,18 +325,19 @@
 	<div class="container">
 		<div class="bread-crumb flex-w p-l-25 p-r-15 p-t-30 p-lr-0-lg">
 			<a th:href="@{/}" class="stext-109 cl8 hov-cl1 trans-04">
-				Home
+				Trang chủ
 				<i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
 			</a>
 
-			<a th:href="@{/products}" class="stext-109 cl8 hov-cl1 trans-04">
-				Men
+			<a th:href="@{/products}" class="stext-109 cl8 hov-cl1 trans-04"
+			   th:text="${product.category != null ? product.category.name : 'Cửa hàng'}">
+				Cửa hàng
 				<i class="fa fa-angle-right m-l-9 m-r-10" aria-hidden="true"></i>
 			</a>
 
-			<span class="stext-109 cl4">
-				Lightweight Jacket
-			</span>
+			<span class="stext-109 cl4" th:text="${product.name}">
+    Tên sản phẩm
+</span>
 		</div>
 	</div>
 		
@@ -351,37 +352,51 @@
 							<div class="wrap-slick3-dots"></div>
 							<div class="wrap-slick3-arrows flex-sb-m flex-w"></div>
 
+<!--							<div class="slick3 gallery-lb">-->
+<!--								<div class="item-slick3" data-thumb="images/product-detail-01.jpg">-->
+<!--									<div class="wrap-pic-w pos-relative pos-relative">-->
+<!--										<img th:src="@{'/images/' + ${product.image}}" alt="IMG-PRODUCT">-->
+
+<!--										<a class="flex-c-m size-108 how-pos1 bor0 fs-16 cl10 bg0 hov-btn3 trans-04" href="/images/product-detail-01.jpg">-->
+<!--											<i class="fa fa-expand"></i>-->
+<!--										</a>-->
+<!--									</div>-->
+<!--								</div>-->
+
+<!--								<div class="item-slick3" data-thumb="images/product-detail-02.jpg">-->
+<!--									<div class="wrap-pic-w pos-relative pos-relative">-->
+<!--										<img th:src="@{'/images/' + ${product.image}}" alt="IMG-PRODUCT">-->
+
+<!--										<a class="flex-c-m size-108 how-pos1 bor0 fs-16 cl10 bg0 hov-btn3 trans-04" href="/images/product-detail-02.jpg">-->
+<!--											<i class="fa fa-expand"></i>-->
+<!--										</a>-->
+<!--									</div>-->
+<!--								</div>-->
+
+<!--								<div class="item-slick3" data-thumb="images/product-detail-03.jpg">-->
+<!--									<div class="wrap-pic-w pos-relative pos-relative">-->
+<!--										<img th:src="@{'/images/' + ${product.image}}" alt="IMG-PRODUCT">-->
+
+<!--										<a class="flex-c-m size-108 how-pos1 bor0 fs-16 cl10 bg0 hov-btn3 trans-04" href="/images/product-detail-03.jpg">-->
+<!--											<i class="fa fa-expand"></i>-->
+<!--										</a>-->
+<!--									</div>-->
+<!--								</div>-->
+<!--							</div>-->
 							<div class="slick3 gallery-lb">
-								<div class="item-slick3" data-thumb="images/product-detail-01.jpg">
-									<div class="wrap-pic-w pos-relative pos-relative">
+								<div class="item-slick3"
+									 th:data-thumb="@{'/images/' + ${product.image}}">
+									<div class="wrap-pic-w pos-relative">
 										<img th:src="@{'/images/' + ${product.image}}" alt="IMG-PRODUCT">
 
-										<a class="flex-c-m size-108 how-pos1 bor0 fs-16 cl10 bg0 hov-btn3 trans-04" href="/images/product-detail-01.jpg">
-											<i class="fa fa-expand"></i>
-										</a>
-									</div>
-								</div>
-
-								<div class="item-slick3" data-thumb="images/product-detail-02.jpg">
-									<div class="wrap-pic-w pos-relative pos-relative">
-										<img th:src="@{'/images/' + ${product.image}}" alt="IMG-PRODUCT">
-
-										<a class="flex-c-m size-108 how-pos1 bor0 fs-16 cl10 bg0 hov-btn3 trans-04" href="/images/product-detail-02.jpg">
-											<i class="fa fa-expand"></i>
-										</a>
-									</div>
-								</div>
-
-								<div class="item-slick3" data-thumb="images/product-detail-03.jpg">
-									<div class="wrap-pic-w pos-relative pos-relative">
-										<img th:src="@{'/images/' + ${product.image}}" alt="IMG-PRODUCT">
-
-										<a class="flex-c-m size-108 how-pos1 bor0 fs-16 cl10 bg0 hov-btn3 trans-04" href="/images/product-detail-03.jpg">
+										<a class="flex-c-m size-108 how-pos1 bor0 fs-16 cl10 bg0 hov-btn3 trans-04"
+										   th:href="@{'/images/' + ${product.image}}">
 											<i class="fa fa-expand"></i>
 										</a>
 									</div>
 								</div>
 							</div>
+
 						</div>
 					</div>
 				</div>
@@ -395,8 +410,8 @@
 
 						<span class="mtext-106 cl2"
 							  th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">
-    250.000 VNĐ
-</span>
+							250.000 VNĐ
+						</span>
 
 						<p class="stext-102 cl3 p-t-23"
 						   th:text="${product.description}">
@@ -446,21 +461,31 @@
 
 							<div class="flex-w flex-r-m p-b-10">
 								<div class="size-204 flex-w flex-m respon6-next">
-									<div class="wrap-num-product flex-w m-r-20 m-tb-10">
-										<div class="btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m">
-											<i class="fs-16 zmdi zmdi-minus"></i>
+
+									<form th:action="@{/cart/add}" method="post" class="flex-w flex-r-m p-b-10">
+										<input type="hidden" name="productId" th:value="${product.id}"/>
+
+										<div class="size-204 flex-w flex-m respon6-next">
+											<div class="wrap-num-product flex-w m-r-20 m-tb-10">
+												<div class="btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m">
+													<i class="fs-16 zmdi zmdi-minus"></i>
+												</div>
+
+												<input class="mtext-104 cl3 txt-center num-product"
+													   type="number" name="quantity" value="1" min="1">
+
+												<div class="btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m">
+													<i class="fs-16 zmdi zmdi-plus"></i>
+												</div>
+											</div>
+
+											<button type="submit"
+													class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04">
+												Thêm vào giỏ
+											</button>
 										</div>
+									</form>
 
-										<input class="mtext-104 cl3 txt-center num-product" type="number" name="num-product" value="1">
-
-										<div class="btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m">
-											<i class="fs-16 zmdi zmdi-plus"></i>
-										</div>
-									</div>
-
-									<button class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04 js-addcart-detail">
-										Add to cart
-									</button>
 								</div>
 							</div>	
 						</div>
@@ -512,8 +537,8 @@
 						<!-- - -->
 						<div class="tab-pane fade show active" id="description" role="tabpanel">
 							<div class="how-pos2 p-lr-15-md">
-								<p class="stext-102 cl6">
-									Aenean sit amet gravida nisi. Nam fermentum est felis, quis feugiat nunc fringilla sit amet. Ut in blandit ipsum. Quisque luctus dui at ante aliquet, in hendrerit lectus interdum. Morbi elementum sapien rhoncus pretium maximus. Nulla lectus enim, cursus et elementum sed, sodales vitae eros. Ut ex quam, porta consequat interdum in, faucibus eu velit. Quisque rhoncus ex ac libero varius molestie. Aenean tempor sit amet orci nec iaculis. Cras sit amet nulla libero. Curabitur dignissim, nunc nec laoreet consequat, purus nunc porta lacus, vel efficitur tellus augue in ipsum. Cras in arcu sed metus rutrum iaculis. Nulla non tempor erat. Duis in egestas nunc.
+								<p class="stext-102 cl6" th:text="${product.description}">
+									Mô tả sản phẩm...
 								</p>
 							</div>
 						</div>
@@ -665,13 +690,15 @@
 		</div>
 
 		<div class="bg6 flex-c-m flex-w size-302 m-t-73 p-tb-15">
-			<span class="stext-107 cl6 p-lr-25">
-				SKU: JAK-01
-			</span>
+    <span class="stext-107 cl6 p-lr-25"
+		  th:text="'Mã sản phẩm: ' + ${product.id}">
+        Mã sản phẩm: 1
+    </span>
 
-			<span class="stext-107 cl6 p-lr-25">
-				Categories: Jacket, Men
-			</span>
+			<span class="stext-107 cl6 p-lr-25"
+				  th:text="'Danh mục: ' + (${product.category != null ? product.category.name : 'Khác'})">
+        Danh mục: Khác
+    </span>
 		</div>
 	</section>
 
@@ -1226,9 +1253,30 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 											</div>
 										</div>
 
-										<button class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04 js-addcart-detail">
-											Add to cart
-										</button>
+										<form th:action="@{/cart/add}" method="post" class="flex-w flex-r-m p-b-10">
+											<input type="hidden" name="productId" th:value="${product.id}"/>
+
+											<div class="size-204 flex-w flex-m respon6-next">
+												<div class="wrap-num-product flex-w m-r-20 m-tb-10">
+													<div class="btn-num-product-down cl8 hov-btn3 trans-04 flex-c-m">
+														<i class="fs-16 zmdi zmdi-minus"></i>
+													</div>
+
+													<input class="mtext-104 cl3 txt-center num-product"
+														   type="number" name="quantity" value="1" min="1">
+
+													<div class="btn-num-product-up cl8 hov-btn3 trans-04 flex-c-m">
+														<i class="fs-16 zmdi zmdi-plus"></i>
+													</div>
+												</div>
+
+												<button type="submit"
+														class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04">
+													Thêm vào giỏ
+												</button>
+											</div>
+										</form>
+
 									</div>
 								</div>	
 							</div>
@@ -1359,6 +1407,8 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 			})
 		});
 	</script>
+
+
 <!--===============================================================================================-->
 	<script src="/js/main.js"></script>
 

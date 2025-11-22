@@ -32,7 +32,13 @@ public class User {
 
     private String phone;
 
-    private String address;
+    @Column(name = "address_line")
+    private String addressLine;
+
+    private String province;
+    private String district;
+    private String ward;
+
 
     private boolean enabled = true;
 
