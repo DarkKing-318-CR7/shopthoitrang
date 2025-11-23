@@ -14,28 +14,28 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
-    private final UserRepository userRepo;
+    private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User u = userRepo.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("Không tìm thấy user: " + username));
 
-        String roleName = (u.getRole() != null && u.getRole().getName() != null)
-                ? u.getRole().getName().trim()
-                : "USER";
-        if (!roleName.startsWith("ROLE_")) {
-            roleName = "ROLE_" + roleName;
-        }
+        // role.name hiện đang là: ROLE_USER hoặc ROLE_ADMIN
+        String roleName = user.getRole().getName();
 
-        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(roleName));
+        List<GrantedAuthority> authorities =
+                List.of(new SimpleGrantedAuthority(roleName));
 
-        return org.springframework.security.core.userdetails.User
-                .withUsername(u.getUsername())
-                .password(u.getPassword())
-                .authorities(authorities)
-                .accountLocked(Boolean.FALSE.equals(u.isEnabled()))
-                .disabled(Boolean.FALSE.equals(u.isEnabled()))
-                .build();
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPassword(),
+                user.isEnabled(),   // enabled
+                true,               // accountNonExpired
+                true,               // credentialsNonExpired
+                true,               // accountNonLocked
+                authorities
+        );
     }
 }

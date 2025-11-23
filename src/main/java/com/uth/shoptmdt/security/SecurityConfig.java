@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -30,34 +30,51 @@ public class SecurityConfig {
         return p;
     }
 
+    // <<< success handler: admin -> /admin, user -> / >>>
+    @Bean
+    public AuthenticationSuccessHandler authenticationSuccessHandler() {
+        return (request, response, authentication) -> {
+            boolean isAdmin = authentication.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+            if (isAdmin) {
+                response.sendRedirect("/admin");   // trang dashboard admin
+            } else {
+                response.sendRedirect("/");        // trang home cho user
+            }
+        };
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers(
-                                "/register",            // POST đăng ký
-                                "/cart/**",             // add/update/remove cart
+                                "/register",
+                                "/cart/**",
                                 "/checkout/**",
                                 "/order/**"
                         )
                 )
                 .authenticationProvider(authProvider())
-                .csrf(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/", "/products/**", "/product/**",
-                                "/css/**","/js/**","/images/**","/vendor/**","/fonts/**","/webjars/**"
+                                "/blog/**", "/about", "/contact",
+                                "/css/**","/js/**","/images/**",
+                                "/vendor/**","/fonts/**","/webjars/**"
                         ).permitAll()
                         .requestMatchers("/login", "/register").permitAll()
-                        // Cho xem giỏ không cần login, nhưng BẮT BUỘC login để checkout/đặt hàng
-                        .requestMatchers("/checkout", "/order/**").authenticated()
-                        .anyRequest().permitAll()
+                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/checkout", "/order/**", "/account/**")
+                        .hasAnyAuthority("ROLE_USER","ROLE_ADMIN")
+                        .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/", true)
+                        // bỏ defaultSuccessUrl, dùng successHandler
+                        .successHandler(authenticationSuccessHandler())
                         .failureUrl("/login?error")
                         .permitAll()
                 )
@@ -66,6 +83,7 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/login?logout")
                         .permitAll()
                 );
+
         return http.build();
     }
 }

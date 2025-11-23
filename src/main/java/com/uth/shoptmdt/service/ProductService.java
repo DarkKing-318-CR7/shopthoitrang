@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -47,5 +48,16 @@ public class ProductService {
         }
 
         return productRepository.findAll(pageable);
+    }
+
+
+
+    public Product save(Product product) {
+        return productRepository.save(product);
+    }
+
+
+    public void deleteById(Long id) {
+        productRepository.deleteById(id);
     }
 }

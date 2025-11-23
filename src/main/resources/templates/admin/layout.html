@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi"
+      th:fragment="adminLayout(content)">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${pageTitle} ?: 'Admin - Shoptmdt'">Admin - Shoptmdt</title>
+
+    <link rel="stylesheet" type="text/css" href="/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/util.css">
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" th:href="@{/admin}">ADMIN PANEL</a>
+
+    <div class="collapse navbar-collapse">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item"><a class="nav-link" th:href="@{/admin/products}">Sản phẩm</a></li>
+            <li class="nav-item"><a class="nav-link" th:href="@{/admin/users}">Người dùng</a></li>
+            <li class="nav-item"><a class="nav-link" th:href="@{/admin/orders}">Đơn hàng</a></li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item"><a class="nav-link" th:href="@{/}">Về trang bán hàng</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div th:replace="${content}"></div>
+</div>
+
+<script src="/vendor/jquery/jquery-3.2.1.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
+</body>
+</html>

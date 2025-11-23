@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi"
+      th:replace="admin/layout :: adminLayout(~{::body})">
+<body>
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">Trang quản trị</h1>
+        <p>Chào mừng bạn đến trang quản trị Shoptmdt.</p>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card text-white bg-primary mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Quản lý sản phẩm</h5>
+                        <p class="card-text">Thêm / sửa / xóa sản phẩm.</p>
+                        <a th:href="@{/admin/products}" class="btn btn-light btn-sm">Đi tới</a>
+                    </div>
+                </div>
+            </div>
+            <!-- sau này thêm card đơn hàng, user, blog, mã giảm giá,... -->
+        </div>
+    </div>
+</div>
+</body>
+</html>

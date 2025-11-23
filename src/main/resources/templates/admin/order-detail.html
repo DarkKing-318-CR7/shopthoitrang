@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi"
+      th:replace="admin/layout :: adminLayout(~{::body})">
+<body>
+<div>
+    <h2 class="mb-3">Chi tiết đơn hàng</h2>
+
+    <div th:if="${param.updated}">
+        <div class="alert alert-success">Đã cập nhật trạng thái đơn hàng.</div>
+    </div>
+
+    <div class="mb-3">
+        <p><strong>Mã đơn:</strong> <span th:text="${order.code}">ORD-001</span></p>
+        <p><strong>Khách hàng:</strong>
+            <span th:text="${order.fullName} ?: ${order.user != null ? order.user.fullName : ''}">
+                Tên KH
+            </span>
+        </p>
+        <p><strong>Số điện thoại:</strong>
+            <span th:text="${order.phone}">SĐT</span>
+        </p>
+        <p><strong>Địa chỉ:</strong>
+            <span th:text="${order.addressLine}">Địa chỉ</span>,
+            <span th:text="${order.ward}">Phường</span>,
+            <span th:text="${order.district}">Quận</span>,
+            <span th:text="${order.province}">Tỉnh</span>
+        </p>
+        <p><strong>Ngày tạo:</strong>
+            <span th:text="${order.createdAt}">2025-01-01</span>
+        </p>
+        <p><strong>Trạng thái:</strong> <span th:text="${order.status}">PENDING</span></p>
+    </div>
+
+    <h4>Sản phẩm trong đơn</h4>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Sản phẩm</th>
+            <th>Đơn giá</th>
+            <th>Số lượng</th>
+            <th>Thành tiền</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${order.items}">
+            <td th:text="${item.productName} ?: ${item.product != null ? item.product.name : ''}">
+                Tên sản phẩm
+            </td>
+            <td th:text="${#numbers.formatDecimal(item.unitPrice,0,'COMMA',0,'POINT')} + ' VNĐ'">
+                0 VNĐ
+            </td>
+            <td th:text="${item.quantity}">1</td>
+            <td th:text="${#numbers.formatDecimal(item.total,0,'COMMA',0,'POINT')} + ' VNĐ'">
+                0 VNĐ
+            </td>
+        </tr>
+
+        <tr th:if="${#lists.isEmpty(order.items)}">
+            <td colspan="4" class="text-center">Không có sản phẩm nào.</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="text-right mb-4">
+        <h5>
+            Tổng đơn:
+            <span th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',0,'POINT')} + ' VNĐ'">
+                0 VNĐ
+            </span>
+        </h5>
+    </div>
+
+    <!-- Form cập nhật trạng thái -->
+    <form th:action="@{'/admin/orders/' + ${order.id} + '/status'}" method="post" class="form-inline mb-3">
+        <label class="mr-2">Cập nhật trạng thái:</label>
+        <select name="status" class="form-control mr-2">
+            <option value="PENDING" th:selected="${order.status == 'PENDING'}">PENDING</option>
+            <option value="PAID" th:selected="${order.status == 'PAID'}">PAID</option>
+            <option value="SHIPPED" th:selected="${order.status == 'SHIPPED'}">SHIPPED</option>
+            <option value="CANCELED" th:selected="${order.status == 'CANCELED'}">CANCELED</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Lưu</button>
+    </form>
+
+    <a th:href="@{/admin/orders}" class="btn btn-secondary">Quay lại danh sách</a>
+</div>
+</body>
+</html>
