@@ -2,9 +2,7 @@
 package com.uth.shoptmdt.service;
 
 import com.uth.shoptmdt.entity.*;
-import com.uth.shoptmdt.repository.OrderRepository;
-import com.uth.shoptmdt.repository.ProductRepository;
-import com.uth.shoptmdt.repository.UserRepository;
+import com.uth.shoptmdt.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +18,7 @@ public class CheckoutService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
+    private final PromotionRepository promotionRepository;   // <<< THÊM MỚI
 
     @Transactional
     public Long placeOrder(String username, CheckoutForm form) {
@@ -31,7 +30,7 @@ public class CheckoutService {
         Order order = new Order();
         order.setUser(user);
 
-        // map từ form từ Shopping Cart (fullName/phone/addressLine/…)
+        // map từ form
         order.setFullName(form.getFullName());
         order.setPhone(form.getPhone());
         order.setAddressLine(form.getAddressLine());
@@ -54,24 +53,43 @@ public class CheckoutService {
             oi.setOrder(order);
             oi.setProduct(p);
 
-            // QUAN TRỌNG: dùng đúng field đã map tên cột
             oi.setUnitPrice(p.getPrice());
-            oi.setQty(ci.getQty());           // nếu giữ cả qty & quantity
+            oi.setQty(ci.getQty());
             oi.setQuantity(ci.getQty());
 
-            // có @PrePersist sẽ tự tính, nhưng mình gán rõ ràng luôn:
-            oi.setLineAmount(p.getPrice().multiply(BigDecimal.valueOf(ci.getQty())));
+            oi.setTotal_amount(p.getPrice().multiply(BigDecimal.valueOf(ci.getQty())));
 
             order.getItems().add(oi);
 
-            total = total.add(oi.getLineAmount());
+            total = total.add(oi.getTotal_amount());
         }
 
-
+        // Tổng trước giảm
         order.setTotalAmount(total);
-        order.setTotal(total); // nếu bảng còn cột 'total'
 
-        Order saved = orderRepository.save(order); // @PrePersist sẽ tự tạo 'code' nếu còn trống
+        // ===== ÁP DỤNG MÃ GIẢM GIÁ =====
+        String code = form.getPromoCode();
+        if (code != null && !code.isBlank()) {
+            Promotion promo = promotionRepository
+                    .findByCodeIgnoreCase(code.trim())
+                    .orElse(null);
+
+            if (promo != null && promo.isValidNow(total)) {
+                BigDecimal discount = promo.calculateDiscount(total);
+                order.setAppliedDiscount(discount);
+                order.setFinalAmount(total.subtract(discount));
+                order.setPromotion(promo);
+            } else {
+                order.setAppliedDiscount(BigDecimal.ZERO);
+                order.setFinalAmount(total);
+            }
+        } else {
+            order.setAppliedDiscount(BigDecimal.ZERO);
+            order.setFinalAmount(total);
+        }
+        // ===== HẾT PHẦN KHUYẾN MÃI =====
+
+        Order saved = orderRepository.save(order);
         cartService.clear();
         return saved.getId();
     }

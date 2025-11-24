@@ -14,84 +14,86 @@ import java.util.UUID;
 @Entity @Table(name = "orders")
 @Getter @Setter @NoArgsConstructor
 public class Order {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Mã đơn (để hiển thị đẹp)
-// ví dụ Order.java
     @Column(name = "code", nullable = false, unique = true, length = 32)
     private String code;
 
-    // Thông tin nhận hàng
+    // Thông tin người nhận
     @Column(nullable = false)
     private String fullName;
+
     @Column(nullable = false)
     private String phone;
+
     @Column(nullable = false)
     private String addressLine;
+
     private String province;
     private String district;
     private String ward;
 
-    // Tổng tiền
     @Column(nullable = false, precision = 18, scale = 2)
     private BigDecimal totalAmount = BigDecimal.ZERO;
 
-    // Trạng thái
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private OrderStatus status = OrderStatus.PENDING;
 
-    // Thời gian
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
     private LocalDateTime updatedAt;
 
-    // Items
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 
-    public void addItem(OrderItem item) {
-        item.setOrder(this);
-        items.add(item);
-    }
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-
-    // thông tin nhận hàng
-    @Column(length = 100)
-    private String receiverName;
-
-    @Column(length = 20)
-    private String receiverPhone;
-
-    @Column(length = 255)
-    private String receiverAddress;
 
     @Column(length = 500)
     private String note;
 
-    // thanh toán / trạng thái
-    @Column(length = 20)
-    private String paymentMethod;      // ví dụ: "COD"
-
-
-    private BigDecimal total;
-
-    // tổng tiền
+    private String paymentMethod; // COD, BANKING,…
 
     @PrePersist
     void prePersist() {
         if (code == null || code.isBlank()) {
             code = "ORD-" +
                     LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmss")) +
-                    "-" + UUID.randomUUID().toString().substring(0,4);
+                    "-" + UUID.randomUUID().toString().substring(0, 4);
         }
         if (createdAt == null) createdAt = LocalDateTime.now();
-        if (totalAmount == null) totalAmount = BigDecimal.ZERO;
-        if (total == null) total = totalAmount; // nếu còn cột total
+    }
+
+    // tổng tiền trước giảm
+
+    @Column(precision = 15, scale = 2)
+    private BigDecimal appliedDiscount; // số tiền đã giảm
+
+    @Column(precision = 15, scale = 2)
+    private BigDecimal finalAmount;     // tổng cuối cùng sau giảm
+
+    // Có thể lưu string code hoặc quan hệ:
+    @ManyToOne
+    @JoinColumn(name = "promotion_id")
+    private Promotion promotion;
+
+    public void applyPromotion(Promotion promo) {
+        if (promo == null || totalAmount == null) {
+            this.appliedDiscount = BigDecimal.ZERO;
+            this.finalAmount = totalAmount;
+            this.promotion = null;
+            return;
+        }
+
+        BigDecimal discount = promo.calculateDiscount(totalAmount);
+        this.appliedDiscount = discount;
+        this.finalAmount = totalAmount.subtract(discount);
+        this.promotion = promo;
     }
 }

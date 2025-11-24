@@ -16,4 +16,6 @@ public class CheckoutForm {
 
     private String note;
     @NotBlank private String paymentMethod = "COD";
+
+    private String promoCode;
 }

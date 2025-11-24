@@ -38,7 +38,7 @@ public class OrderItem {
 
     // DB bắt buộc NOT NULL
     @Column(name = "line_amount", nullable = false)
-    private BigDecimal lineAmount;
+    private BigDecimal total_amount;
 
     @PrePersist
     @PreUpdate
@@ -47,6 +47,6 @@ public class OrderItem {
         if (qty == null) qty = quantity;
         if (unitPrice == null) unitPrice = BigDecimal.ZERO;
         if (qty == null) qty = 0;
-        lineAmount = unitPrice.multiply(BigDecimal.valueOf(qty));
+        total_amount = unitPrice.multiply(BigDecimal.valueOf(qty));
     }
 }

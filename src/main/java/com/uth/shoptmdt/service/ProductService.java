@@ -60,4 +60,8 @@ public class ProductService {
     public void deleteById(Long id) {
         productRepository.deleteById(id);
     }
+
+    public long countAll() {
+        return productRepository.count();
+    }
 }

@@ -1,6 +1,7 @@
 package com.uth.shoptmdt.controller.admin;
 
 import com.uth.shoptmdt.entity.Product;
+import com.uth.shoptmdt.service.CategoryService;
 import com.uth.shoptmdt.service.ProductService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,9 +16,11 @@ import java.math.BigDecimal;
 public class AdminProductController {
 
     private final ProductService productService;
+    private final CategoryService categoryService;
 
-    public AdminProductController(ProductService productService) {
+    public AdminProductController(ProductService productService, CategoryService categoryService) {
         this.productService = productService;
+        this.categoryService = categoryService;
     }
 
     // LIST
@@ -36,6 +39,7 @@ public class AdminProductController {
         p.setPrice(BigDecimal.ZERO);
         model.addAttribute("product", p);
         model.addAttribute("pageTitle", "Thêm sản phẩm");
+        model.addAttribute("categories", categoryService.findAll());
         return "admin/product-form";
     }
 
@@ -51,6 +55,7 @@ public class AdminProductController {
 
         model.addAttribute("product", p);
         model.addAttribute("pageTitle", "Sửa sản phẩm (ID: " + id + ")");
+        model.addAttribute("categories", categoryService.findAll());
         return "admin/product-form";
     }
 

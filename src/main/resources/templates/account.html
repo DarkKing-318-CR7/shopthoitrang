@@ -135,7 +135,8 @@
                         <tr th:each="o : ${orders}">
                             <td th:text="${o.code != null ? o.code : ('#' + o.id)}">#123</td>
                             <td th:text="${#temporals.format(o.createdAt, 'dd/MM/yyyy HH:mm')}">16/11/2025 10:00</td>
-                            <td th:text="${#numbers.formatDecimal((o.totalAmount != null ? o.totalAmount : o.total),0,'COMMA',0,'POINT')}">0</td>
+                            <td th:text="${#numbers.formatDecimal((o.finalAmount != null ? o.finalAmount : o.totalAmount),0,'COMMA',0,'POINT')} + ' VNĐ'">
+                                0 VNĐ</td>
                                                             <td>
                                 <span class="badge"
                                       th:classappend="${o.status.name() == 'COMPLETED' ? ' text-bg-success' :

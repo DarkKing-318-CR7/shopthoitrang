@@ -314,7 +314,7 @@
 
 
 	<!-- Shoping Cart -->
-	<form class="bg0 p-t-75 p-b-85">
+	<div class="bg0 p-t-75 p-b-85">
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-10 col-xl-7 m-lr-auto m-b-50">
@@ -378,20 +378,6 @@
 							</table>
 						</div>
 
-						<div class="flex-w flex-sb-m bor15 p-t-18 p-b-15 p-lr-40 p-lr-15-sm">
-							<div class="flex-w flex-m m-r-20 m-tb-5">
-								<input id="coupon-code"
-									   class="stext-104 cl2 plh4 size-117 bor13 p-lr-20 m-r-10 m-tb-5"
-									   type="text" name="coupon" placeholder="Nhập mã (GIAM10, GIAM20)">
-
-								<button type="button"
-										id="btn-apply-coupon"
-										class="flex-c-m stext-101 cl2 size-118 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-5">
-									Áp dụng
-								</button>
-							</div>
-
-
 							<div class="flex-c-m stext-101 cl2 size-119 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer m-tb-10">
 								Cập nhật giỏ hàng
 							</div>
@@ -401,8 +387,8 @@
 									Xóa hết giỏ hàng
 								</button>
 							</form>
-
 						</div>
+
 					</div>
 				</div>
 
@@ -454,53 +440,84 @@
 
 					<!-- Ghi chú -->
 					<div class="bor8 bg0 m-b-12">
-        <textarea class="stext-111 cl8 plh3 size-111 p-lr-15"
-				  th:field="*{note}"
-				  placeholder="Ghi chú"></textarea>
+					<textarea class="stext-111 cl8 plh3 size-111 p-lr-15"
+							  th:field="*{note}"
+							  placeholder="Ghi chú"></textarea>
 					</div>
 
+					<!-- Mã giảm giá + nút Áp dụng -->
+					<div class="bor8 bg0 m-b-12">
+						<div class="row">
+							<div class="col-8">
+								<input class="stext-111 cl8 plh3 size-111 p-lr-15"
+									   type="text"
+									   th:field="*{promoCode}"
+									   placeholder="Nhập mã (GIAM10, GIAM20)">
+							</div>
+							<div class="col-4 m-t-5">
+								<button type="submit"
+										name="action"
+										value="apply"
+										class="flex-c-m stext-101 cl2 size-119 bg8 bor13 hov-btn3 p-lr-15 trans-04 pointer">
+									Áp dụng
+								</button>
+							</div>
+						</div>
+					</div>
+
+					<!-- TÓM TẮT TIỀN -->
 					<div class="flex-w flex-t p-t-27 p-b-10">
 						<div class="size-208">
-							<span class="mtext-101 cl2">Tổng:</span>
+							<span class="mtext-101 cl2">Tạm tính:</span>
 						</div>
 						<div class="size-209 p-t-1">
-		<span id="order-total"
-			  class="mtext-110 cl2"
-			  th:attr="data-total=${totalAmount}"
+        <span class="mtext-110 cl2"
 			  th:text="${#numbers.formatDecimal(totalAmount,0,'COMMA',0,'POINT')} + ' VNĐ'">
-			0 VNĐ
-		</span>
+            0 VNĐ
+        </span>
 						</div>
 					</div>
 
-					<!-- Dòng hiển thị giá sau giảm -->
-					<div id="discount-line"
-						 class="flex-w flex-t p-b-10"
-						 style="display:none;">
+					<div class="flex-w flex-t p-b-10"
+						 th:if="${appliedDiscount != null and appliedDiscount > 0}">
 						<div class="size-208">
-							<span class="mtext-101 cl2">Sau giảm:</span>
+							<span class="mtext-101 cl2">Giảm giá:</span>
 						</div>
 						<div class="size-209 p-t-1">
-		<span id="order-total-discount" class="mtext-110 cl2">
-			0 VNĐ
-		</span>
+        <span class="mtext-110 cl2"
+			  th:text="${'- ' + #numbers.formatDecimal(appliedDiscount,0,'COMMA',0,'POINT') + ' VNĐ'}">
+            - 0 VNĐ
+        </span>
 						</div>
 					</div>
 
-					<!-- Thông báo mã giảm giá -->
-					<span id="coupon-message" class="stext-102 p-t-5 d-block"></span>
-
+					<div class="flex-w flex-t p-b-10">
+						<div class="size-208">
+							<span class="mtext-101 cl2">Thành tiền:</span>
+						</div>
+						<div class="size-209 p-t-1">
+        <span class="mtext-110 cl2"
+			  th:text="${#numbers.formatDecimal((finalAmount != null ? finalAmount : totalAmount),0,'COMMA',0,'POINT')} + ' VNĐ'">
+            0 VNĐ
+        </span>
+						</div>
+					</div>
 
 					<button type="submit"
+							name="action"
+							value="place"
 							class="flex-c-m stext-101 cl0 size-116 bg3 bor14 hov-btn3 p-lr-15 trans-04 pointer">
 						Thanh toán
 					</button>
 				</form>
 
 
+			</form>
+
+
 			</div>
 		</div>
-	</form>
+	</div>
 		
 	
 		
@@ -691,51 +708,7 @@
 		});
 	</script>
 
-	<script>
-		document.addEventListener('DOMContentLoaded', function () {
-			const totalEl = document.getElementById('order-total');
-			const couponInput = document.getElementById('coupon-code');
-			const btnApply = document.getElementById('btn-apply-coupon');
-			const discountLine = document.getElementById('discount-line');
-			const totalDiscountEl = document.getElementById('order-total-discount');
-			const messageEl = document.getElementById('coupon-message');
 
-			if (!totalEl || !btnApply) return;
-
-			// Lấy tổng tiền gốc từ data-total (số)
-			const originalTotal = parseFloat(totalEl.getAttribute('data-total') || '0');
-
-			function formatVND(v) {
-				return v.toLocaleString('vi-VN') + ' VNĐ';
-			}
-
-			btnApply.addEventListener('click', function () {
-				const code = (couponInput.value || '').trim().toUpperCase();
-				let percent = 0;
-
-				if (code === 'GIAM10') {
-					percent = 10;
-				} else if (code === 'GIAM20') {
-					percent = 20;
-				}
-
-				if (percent === 0) {
-					discountLine.style.display = 'none';
-					messageEl.textContent = 'Mã giảm giá không hợp lệ hoặc đã hết hạn.';
-					messageEl.style.color = '#e74c3c';
-					return;
-				}
-
-				const discounted = Math.round(originalTotal * (100 - percent) / 100);
-
-				totalDiscountEl.textContent = formatVND(discounted);
-				discountLine.style.display = 'flex';
-
-				messageEl.textContent = `Áp dụng mã ${code} giảm ${percent}% thành công!`;
-				messageEl.style.color = '#27ae60';
-			});
-		});
-	</script>
 	<script src="/js/main.js"></script>
 
 	<!--===============================================================================================-->

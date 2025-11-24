@@ -1,10 +1,12 @@
 package com.uth.shoptmdt.service;
 
 import com.uth.shoptmdt.entity.Order;
+import com.uth.shoptmdt.entity.OrderStatus;
 import com.uth.shoptmdt.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +18,7 @@ public class OrderService{
 
 
     public List<Order> findAll() {
-        return repo.findAll();
+        return repo.findAllByOrderByCreatedAtDesc();
     }
 
     public Optional<Order> findById(Long id) {
@@ -26,4 +28,17 @@ public class OrderService{
     public Order save(Order order) {
         return repo.save(order);
     }
+
+    public long countPendingOrders() {
+        return repo.countByStatus(OrderStatus.PENDING);
+    }
+
+    public BigDecimal getTotalRevenue() {
+        return repo.sumTotalRevenue();
+    }
+
+    public List<Order> getLatestPendingOrders() {
+        return repo.findTop5ByStatusOrderByCreatedAtDesc(OrderStatus.PENDING);
+    }
+
 }

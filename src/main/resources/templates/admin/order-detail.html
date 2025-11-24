@@ -43,14 +43,14 @@
         </thead>
         <tbody>
         <tr th:each="item : ${order.items}">
-            <td th:text="${item.productName} ?: ${item.product != null ? item.product.name : ''}">
+            <td th:text="${item.product.name} ?: ${item.product != null ? item.product.name : ''}">
                 Tên sản phẩm
             </td>
             <td th:text="${#numbers.formatDecimal(item.unitPrice,0,'COMMA',0,'POINT')} + ' VNĐ'">
                 0 VNĐ
             </td>
             <td th:text="${item.quantity}">1</td>
-            <td th:text="${#numbers.formatDecimal(item.total,0,'COMMA',0,'POINT')} + ' VNĐ'">
+            <td th:text="${#numbers.formatDecimal(item.total_amount,0,'COMMA',0,'POINT')} + ' VNĐ'">
                 0 VNĐ
             </td>
         </tr>
@@ -63,12 +63,27 @@
 
     <div class="text-right mb-4">
         <h5>
-            Tổng đơn:
+            Tạm tính:
             <span th:text="${#numbers.formatDecimal(order.totalAmount,0,'COMMA',0,'POINT')} + ' VNĐ'">
-                0 VNĐ
-            </span>
+            0 VNĐ
+        </span>
+        </h5>
+
+        <h5 th:if="${order.appliedDiscount != null and order.appliedDiscount > 0}">
+            Giảm giá:
+            <span th:text="${'- ' + #numbers.formatDecimal(order.appliedDiscount,0,'COMMA',0,'POINT')} + ' VNĐ'">
+            - 0 VNĐ
+        </span>
+        </h5>
+
+        <h5>
+            Thành tiền:
+            <span th:text="${#numbers.formatDecimal((order.finalAmount != null ? order.finalAmount : order.totalAmount),0,'COMMA',0,'POINT')} + ' VNĐ'">
+            0 VNĐ
+        </span>
         </h5>
     </div>
+
 
     <!-- Form cập nhật trạng thái -->
     <form th:action="@{'/admin/orders/' + ${order.id} + '/status'}" method="post" class="form-inline mb-3">
