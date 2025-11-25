@@ -48,11 +48,24 @@ public class AdminUserController {
     // SAVE
     @PostMapping("/save")
     public String saveUser(@ModelAttribute("user") User user) {
-        // TODO: nếu là user mới -> cần mã hoá password (BCryptPasswordEncoder)
-        // nếu đang sửa thì nên giữ lại password cũ nếu field bị bỏ trống.
+
+        // ==== CASE: EDIT USER ====
+        if (user.getId() != null) {
+            User existing = userService.findById(user.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy user id=" + user.getId()));
+
+            // Nếu password từ form để trống → giữ nguyên password cũ
+            if (user.getPassword() == null || user.getPassword().isBlank()) {
+                user.setPassword(existing.getPassword());
+            }
+        }
+
+        // ==== LƯU (UserService sẽ tự encode password nếu cần) ====
         userService.save(user);
+
         return "redirect:/admin/users?success";
     }
+
 
     // ENABLE / DISABLE
     @PostMapping("/toggle/{id}")
