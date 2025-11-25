@@ -9,12 +9,19 @@ import java.time.LocalDateTime;
 @Getter @Setter
 public class RevenuePoint {
 
-    private final LocalDateTime orderDate;
-    private final BigDecimal totalAmount;
+    private LocalDateTime orderDate;
+    private BigDecimal totalAmount;
 
     public RevenuePoint(LocalDateTime orderDate, BigDecimal totalAmount) {
         this.orderDate = orderDate;
         this.totalAmount = totalAmount;
     }
 
+    public LocalDateTime getOrderDate() {
+        return orderDate;
+    }
+
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
+    }
 }

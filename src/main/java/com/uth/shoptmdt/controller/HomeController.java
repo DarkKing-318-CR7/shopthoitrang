@@ -3,6 +3,7 @@ package com.uth.shoptmdt.controller;
 import com.uth.shoptmdt.entity.User;
 import com.uth.shoptmdt.repository.OrderRepository;
 import com.uth.shoptmdt.repository.UserRepository;
+import com.uth.shoptmdt.service.CategoryService;
 import com.uth.shoptmdt.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -20,10 +21,12 @@ public class HomeController {
     private final ProductService productService;
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
+    private final CategoryService categoryService;
 
     @GetMapping("/")
     public String home(Model model) {
         model.addAttribute("products", productService.findAll());
+        model.addAttribute("categories", categoryService.findAll());
         return "index"; // trả về templates/index.html
     }
 

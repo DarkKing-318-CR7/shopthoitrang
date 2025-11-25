@@ -1,11 +1,10 @@
 // src/main/java/com/uth/shoptmdt/controller/admin/AdminHomeController.java
+
 package com.uth.shoptmdt.controller.admin;
 
-import com.uth.shoptmdt.entity.Order;
 import com.uth.shoptmdt.entity.OrderStatus;
 import com.uth.shoptmdt.repository.OrderRepository;
 import com.uth.shoptmdt.repository.ProductRepository;
-import com.uth.shoptmdt.repository.RevenuePoint;
 import com.uth.shoptmdt.repository.UserRepository;
 import com.uth.shoptmdt.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin")
@@ -41,37 +40,50 @@ public class AdminHomeController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
             Model model) {
 
-        // ====== DEFAULT RANGE: LAST 7 DAYS ======
         if (to == null) to = LocalDate.now();
         if (from == null) from = to.minusDays(6);
 
-        // convert to LocalDateTime because DB uses LocalDateTime
-        LocalDateTime fromDateTime = from.atStartOfDay();           // 00:00 ngày from
-        LocalDateTime toDateTime   = to.plusDays(1).atStartOfDay(); // 00:00 ngày tiếp theo
+        LocalDateTime fromDT = from.atStartOfDay();
+        LocalDateTime toDT   = to.plusDays(1).atStartOfDay();
 
-// ===== DASHBOARD STATS =====
         long totalProducts = productRepository.count();
         long pendingOrders = orderRepository.countByStatus(OrderStatus.PENDING);
         long totalUsers    = userRepository.count();
 
+        // Lấy dữ liệu doanh thu dạng Object[]
+        List<Object[]> rows = orderRepository.getRevenueStats(fromDT, toDT);
 
+        List<String> labels = new ArrayList<>();
+        List<BigDecimal> dailyData = new ArrayList<>();
+        List<BigDecimal> cumulativeData = new ArrayList<>();
 
-// ===== REVENUE CHART DATA =====
-        List<RevenuePoint> revenuePoints =
-                orderRepository.getRevenueStats(fromDateTime, toDateTime);
+        BigDecimal cumulative = BigDecimal.ZERO;
 
-        List<String> labels = revenuePoints.stream()
-                .map(p -> p.getOrderDate().toLocalDate().toString())
-                .collect(Collectors.toList());
+        for (Object[] r : rows) {
 
-        List<BigDecimal> data = revenuePoints.stream()
-                .map(RevenuePoint::getTotalAmount)
-                .collect(Collectors.toList());
+            // ----- DATE -----
+            Object d = r[0];
+            LocalDate date;
 
-//        List<Order> recentPendingOrders =
-//                orderRepository.findTop5ByStatusOrderByCreatedAtDesc(OrderStatus.PENDING);
+            if (d instanceof LocalDate ld) date = ld;
+            else if (d instanceof java.sql.Date sd) date = sd.toLocalDate();
+            else if (d instanceof LocalDateTime ldt) date = ldt.toLocalDate();
+            else date = null;
 
-// ===== SET MODEL =====
+            labels.add(date != null ? date.toString() : d.toString());
+
+            // ----- DAILY AMOUNT -----
+            BigDecimal dayAmount = (BigDecimal) r[1];
+            if (dayAmount == null) dayAmount = BigDecimal.ZERO;
+
+            dailyData.add(dayAmount);
+
+            // ----- CUMULATIVE -----
+            cumulative = cumulative.add(dayAmount);
+            cumulativeData.add(cumulative);
+        }
+
+        // Gửi về View
         model.addAttribute("pageTitle", "Trang quản trị");
         model.addAttribute("totalProducts", totalProducts);
         model.addAttribute("pendingOrders", pendingOrders);
@@ -79,9 +91,13 @@ public class AdminHomeController {
 
         model.addAttribute("from", from);
         model.addAttribute("to", to);
+
         model.addAttribute("revenueLabels", labels);
-        model.addAttribute("revenueData", data);
+        model.addAttribute("revenueDailyData", dailyData);       // biểu đồ cột
+        model.addAttribute("revenueCumulativeData", cumulativeData); // biểu đồ line
+
         model.addAttribute("latestPendingOrders", orderService.getLatestPendingOrders());
+
         return "admin/dashboard";
     }
 }

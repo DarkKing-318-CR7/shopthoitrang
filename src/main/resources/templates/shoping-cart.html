@@ -333,7 +333,11 @@
 								<tr class="table_row" th:each="it : ${items}">
 									<td class="column-1">
 										<div class="how-itemcart1">
-											<img th:src="@{/images/{img}(img=${it.product.image})}" alt="IMG">
+											<img th:src="${#strings.startsWith(it.product.image, 'http')
+											  ? it.product.image
+											  : '/images/' + it.product.image}"
+												 alt="IMG">
+
 										</div>
 									</td>
 

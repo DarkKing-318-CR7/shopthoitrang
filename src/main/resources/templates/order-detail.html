@@ -76,7 +76,12 @@
                             <tr th:each="it : ${order.items}">
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <img class="thumb me-3" th:src="@{'/images/' + ${it.product.image}}" alt="">
+                                        <img class="thumb me-3"
+                                             th:src="${#strings.startsWith(it.product.image, 'http')
+                                                 ? it.product.image
+                                                 : '/images/' + it.product.image}"
+                                             alt="">
+
                                         <div>
                                             <a th:href="@{'/product/' + ${it.product.id}}"
                                                th:text="${it.product.name}">Tên sản phẩm</a>

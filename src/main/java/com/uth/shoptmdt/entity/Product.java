@@ -24,7 +24,7 @@ public class Product {
     @Column(length = 2000)
     private String description;
 
-    @Column(length = 255)
+    @Column(name = "image", length = 5000)
     private String image; // tên file ảnh, ví dụ: "product-01.jpg"
 
     private Integer quantity; // tồn kho

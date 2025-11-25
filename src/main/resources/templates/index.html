@@ -481,30 +481,24 @@
 			</div>
 
 			<div class="flex-w flex-sb-m p-b-52">
-				<div class="flex-w flex-l-m filter-tope-group m-tb-10">
-					<button class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5 how-active1" data-filter="*">
-						Tất cả sản phẩm
-					</button>
-
-					<button class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5" data-filter=".women">
-						Nam
-					</button>
-
-					<button class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5" data-filter=".men">
-						Nữ
-					</button>
-
-					<button class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5" data-filter=".bag">
-						Túi
-					</button>
-
-					<button class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5" data-filter=".shoes">
-						Giày
-					</button>
-
-					<button class="stext-106 cl6 hov1 bor3 trans-04 m-r-32 m-tb-5" data-filter=".watches">
-						Đồng hồ
-					</button>
+				<div class="container p-b-20">
+					<ul class="nav nav-tabs border-0">
+						<li class="nav-item">
+							<a class="nav-link"
+							   th:href="@{/products(sort=${sort}, size=${size})}"
+							   th:classappend="${categoryId==null} ? 'active' : ''">
+								Tất cả sản phẩm
+							</a>
+						</li>
+						<li class="nav-item" th:each="c : ${categories}">
+							<a class="nav-link"
+							   th:text="${c.name}"
+							   th:href="@{/products(categoryId=${c.id}, sort=${sort}, size=${size})}"
+							   th:classappend="${categoryId==c.id} ? 'active' : ''">
+								Danh mục
+							</a>
+						</li>
+					</ul>
 				</div>
 
 				<div class="flex-w flex-c-m m-tb-10">

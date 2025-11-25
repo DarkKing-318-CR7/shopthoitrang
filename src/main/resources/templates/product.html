@@ -578,7 +578,7 @@
 						<div class="block2">
 							<div class="block2-pic hov-img0">
 								<!-- nếu ảnh lưu chỉ là tên file, để trong /images/product/ -->
-								<img th:src="@{/images/{img}(img=${p.image})}" alt="IMG-PRODUCT">
+								<img th:src="${#strings.startsWith(p.image, 'http') ? p.image : '/images/' + p.image}" alt="IMG-PRODUCT">
 
 								<a th:href="@{'/product/' + ${p.id}}"cả
 								   class="block2-btn flex-c-m stext-103 cl2 size-102 bg0 bor2 hov-btn1 p-lr-15 trans-04">
@@ -595,7 +595,7 @@
 
 									<span class="stext-105 cl3"
 										  th:text="${#numbers.formatDecimal(p.price, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'">
-            </span>
+									</span>
 								</div>
 							</div>
 

@@ -64,4 +64,5 @@ public class ProductService {
     public long countAll() {
         return productRepository.count();
     }
+
 }

@@ -30,7 +30,7 @@
     <tr th:each="p : ${products}">
         <td th:text="${p.id}">1</td>
         <td>
-            <img th:src="@{/images/{img}(img=${p.image})}"
+            <img th:src="${#strings.startsWith(p.image, 'http') ? p.image : '/images/' + p.image}"
                  style="width:60px;height:60px;object-fit:cover;" alt="IMG">
         </td>
         <td th:text="${p.name}">Tên</td>

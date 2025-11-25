@@ -43,18 +43,15 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     // Thống kê doanh thu theo thời gian
     @Query("""
-           SELECT NEW com.uth.shoptmdt.repository.RevenuePoint(
-               o.createdAt,
-               SUM(o.finalAmount)
-           )
-           FROM Order o
-           WHERE o.status IN (com.uth.shoptmdt.entity.OrderStatus.PAID,
-                              com.uth.shoptmdt.entity.OrderStatus.SHIPPED)
-             AND o.createdAt BETWEEN :from AND :to
-           GROUP BY o.createdAt
-           ORDER BY o.createdAt
-           """)
-    List<RevenuePoint> getRevenueStats(@Param("from") LocalDateTime from,
-                                       @Param("to") LocalDateTime to);
+    SELECT FUNCTION('DATE', o.createdAt),
+           SUM(COALESCE(o.finalAmount, o.totalAmount, 0))
+    FROM Order o
+    WHERE o.status IN (com.uth.shoptmdt.entity.OrderStatus.PAID,
+                       com.uth.shoptmdt.entity.OrderStatus.SHIPPED)
+      AND o.createdAt BETWEEN :from AND :to
+    GROUP BY FUNCTION('DATE', o.createdAt)
+    ORDER BY FUNCTION('DATE', o.createdAt)
+""")
+    List<Object[]> getRevenueStats(LocalDateTime from, LocalDateTime to);
 
 }

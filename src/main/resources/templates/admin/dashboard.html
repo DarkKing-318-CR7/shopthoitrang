@@ -66,10 +66,26 @@
                     </div>
                 </form>
 
-                <canvas id="revenueChart" height="80"></canvas>
+                <canvas id="revenueChart" height="5"></canvas>
             </div>
         </div>
     </div>
+</div>
+
+<div class="row">
+
+    <!-- Line Chart: Cộng dồn -->
+    <div class="col-md-6">
+        <h4>Doanh thu cộng dồn</h4>
+        <canvas id="chartCumulative"></canvas>
+    </div>
+
+    <!-- Bar Chart: Doanh thu từng ngày -->
+    <div class="col-md-6">
+        <h4>Doanh thu từng ngày</h4>
+        <canvas id="chartDaily"></canvas>
+    </div>
+
 </div>
 
 <div class="row mt-4">
@@ -149,39 +165,65 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script th:inline="javascript">
     /*<![CDATA[*/
-    const labels = /*[[${revenueLabels}]]*/ [];
-    const data = /*[[${revenueData}]]*/ [];
 
-    const ctx = document.getElementById('revenueChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
+    const labels = /*[[${revenueLabels}]]*/ [];
+    const dailyData = /*[[${revenueDailyData}]]*/ [];
+    const cumulativeData = /*[[${revenueCumulativeData}]]*/ [];
+
+    // =====================
+    // 1️⃣ Biểu đồ Line – Cộng dồn
+    // =====================
+    new Chart(document.getElementById("chartCumulative"), {
+        type: "line",
         data: {
             labels: labels,
             datasets: [{
-                label: 'Doanh thu (VNĐ)',
-                data: data,
-                tension: 0.3,
+                label: "Doanh thu cộng dồn (VNĐ)",
+                data: cumulativeData,
                 borderWidth: 2,
-                pointRadius: 3,
-                fill: false
+                tension: 0.3,
+                pointRadius: 4
             }]
         },
         options: {
-            plugins: {
-                legend: { display: false }
-            },
+            plugins: { legend: { display: false }},
             scales: {
                 y: {
                     ticks: {
-                        callback: function(value) {
-                            return value.toLocaleString('vi-VN') + ' đ';
-                        }
+                        callback: v => v.toLocaleString("vi-VN") + " đ"
                     }
                 }
             }
         }
     });
+
+    // =====================
+    // 2️⃣ Biểu đồ Bar – Doanh thu từng ngày
+    // =====================
+    new Chart(document.getElementById("chartDaily"), {
+        type: "bar",
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Doanh thu từng ngày (VNĐ)",
+                data: dailyData,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false }},
+            scales: {
+                y: {
+                    ticks: {
+                        callback: v => v.toLocaleString("vi-VN") + " đ"
+                    }
+                }
+            }
+        }
+    });
+
     /*]]>*/
 </script>
+
 </body>
 </html>

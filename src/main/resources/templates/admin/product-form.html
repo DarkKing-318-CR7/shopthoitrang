@@ -35,10 +35,14 @@
     </div>
 
     <div class="form-group">
-        <label for="image">Tên file ảnh (trong /images)</label>
-        <input id="image" type="text" class="form-control" th:field="*{image}">
-        <small class="form-text text-muted">Ví dụ: product-01.jpg</small>
+        <label for="image">Link ảnh (URL hoặc tên file)</label>
+        <input id="image" type="text" class="form-control" th:field="*{image}"
+               placeholder="https://example.com/image.jpg">
+        <small class="form-text text-muted">Nhập URL mạng hoặc file trong /images</small>
     </div>
+
+    <img id="imgPreview" th:src="${product.image}"
+         style="max-height: 150px; border: 1px solid #ccc; margin-top: 10px;">
 
     <div class="form-group">
         <label for="description">Mô tả</label>
@@ -52,4 +56,10 @@
     <a th:href="@{/admin/products}" class="btn btn-secondary">Quay lại</a>
 </form>
 </body>
+
+<script>
+    document.getElementById("image").addEventListener("input", function() {
+        document.getElementById("imgPreview").src = this.value;
+    });
+</script>
 </html>
